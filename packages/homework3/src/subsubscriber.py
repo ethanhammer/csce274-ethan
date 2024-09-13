@@ -3,7 +3,7 @@ import rospy
 from std_msgs.msg import Float32  
 
 def callback(msg):
-    rospy.loginfo("Received: %d", msg.data)
+    rospy.loginfo("Received: %f", msg.data)
 
 def listenerer():
     
