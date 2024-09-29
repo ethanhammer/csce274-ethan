@@ -1,26 +1,23 @@
 #!/usr/bin/env python3
 
 import rospy
-from geometry_msgs.msg import Twist
+from duckietown_msgs.msg import Twist2DStamped  # Adjust package name as necessary
 import time
 
 def move_duckiebot():
     rospy.init_node('line', anonymous=True)
-    pub = rospy.Publisher('/bigbot/car_cmd_switch_node/cmd', Twist, queue_size=10)
+    pub = rospy.Publisher('/bigbot/car_cmd_switch_node/cmd', Twist2DStamped, queue_size=10)
 
     # Parameters
     distance = 1.0  # 1 meter
     speed = 0.3     # m/s
     time_to_move = distance / speed  # time in seconds
 
-    # Create a Twist message for forward movement
-    move_command = Twist()
-    move_command.linear.x = speed
-    move_command.linear.y = 0
-    move_command.linear.z = 0
-    move_command.angular.x = 0
-    move_command.angular.y = 0
-    move_command.angular.z = 0
+    # Create a Twist2DStamped message for forward movement
+    move_command = Twist2DStamped()
+    move_command.header.stamp = rospy.Time.now()
+    move_command.v = speed  # Set linear velocity
+    move_command.omega = 0  # Set angular velocity
 
     # Publish the move command
     rospy.loginfo("Moving Duckiebot forward...")
@@ -28,11 +25,15 @@ def move_duckiebot():
     start_time = rospy.get_time()
 
     while rospy.get_time() - start_time < time_to_move:
+        move_command.header.stamp = rospy.Time.now()  # Update the timestamp
         pub.publish(move_command)
         rate.sleep()
 
-    # Create a Twist message to stop the Duckiebot
-    stop_command = Twist()
+    # Create a stop command
+    stop_command = Twist2DStamped()
+    stop_command.header.stamp = rospy.Time.now()
+    stop_command.v = 0
+    stop_command.omega = 0
     pub.publish(stop_command)
     rospy.loginfo("Duckiebot stopped.")
 
