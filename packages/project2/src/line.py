@@ -12,7 +12,7 @@ def drive_straight():
     pub = rospy.Publisher('/car_cmd_switch_node/car_cmd', WheelsCmd, queue_size=10)
     
     # Set the rate of publishing
-    rate = rospy.Rate(10)  # 10 Hz
+    rate = rospy.Rate(0.1)  # 10 Hz
 
     # Create a WheelCmd message
     cmd = WheelsCmd()
