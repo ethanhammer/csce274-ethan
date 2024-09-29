@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import rospy
-from duckietown_msgs.msg import WheelCmd
+from duckietown_msgs.msg import WheelsCmd
 import time
 
 def drive_straight():
@@ -9,13 +9,13 @@ def drive_straight():
     rospy.init_node('linetest', anonymous=True)
     
     # Create a publisher for the car command
-    pub = rospy.Publisher('/car_cmd_switch_node/car_cmd', WheelCmd, queue_size=10)
+    pub = rospy.Publisher('/car_cmd_switch_node/car_cmd', WheelsCmd, queue_size=10)
     
     # Set the rate of publishing
     rate = rospy.Rate(10)  # 10 Hz
 
     # Create a WheelCmd message
-    cmd = WheelCmd()
+    cmd = WheelsCmd()
     cmd.vel_left = 0.3  # Adjust speed as necessary (m/s)
     cmd.vel_right = 0.3  # Adjust speed as necessary (m/s)
 
