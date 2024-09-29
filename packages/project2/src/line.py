@@ -9,7 +9,7 @@ def drive_straight():
     rospy.init_node('linetest', anonymous=True)
     
     # Create a publisher for the car command
-    pub = rospy.Publisher('/car_cmd_switch_node/car_cmd', WheelsCmd, queue_size=10)
+    pub = rospy.Publisher('/bigbot/car_cmd_switch_node/cmd', WheelsCmd, queue_size=10)
     
     # Set the rate of publishing
     rate = rospy.Rate(0.1)  # 10 Hz
