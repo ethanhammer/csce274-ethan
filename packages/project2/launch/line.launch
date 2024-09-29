@@ -1,0 +1,5 @@
+<launch>
+	<group ns="duck44">
+		<node name="line" pkg="project2" type="line.py" output="screen" />
+	</group>
+</launch>
