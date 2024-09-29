@@ -1,49 +1,44 @@
 #!/usr/bin/env python3
 
-import os
 import rospy
-from duckietown.dtros import DTROS, NodeType
-from duckietown_msgs.msg import Twist2DStamped
+from geometry_msgs.msg import Twist
+import time
 
-# Set linear velocity in m/s
-VELOCITY = 0.3  # Forward linear velocity
+def move_duckiebot():
+    rospy.init_node('line', anonymous=True)
+    pub = rospy.Publisher('/bigbot/car_cmd_switch_node/cmd', Twist, queue_size=10)
 
-class line(DTROS):
+    # Parameters
+    distance = 1.0  # 1 meter
+    speed = 0.3     # m/s
+    time_to_move = distance / speed  # time in seconds
 
-    def __init__(self, node_name):
-        super(MoveOneMeterNode, self).__init__(node_name=node_name, node_type=NodeType.GENERIC)
-        
-        # Get vehicle name from environment
-        vehicle_name = os.environ['bigbot']
-        twist_topic = f"/bigbot/car_cmd_switch_node/cmd"
-        
-        # Construct publisher
-        self._publisher = rospy.Publisher(twist_topic, Twist2DStamped, queue_size=1)
-        
-        # Calculate the time to move 1 meter
-        self.move_distance = 1.0  # 1 meter
-        self.time_to_move = self.move_distance / VELOCITY  # seconds
+    # Create a Twist message for forward movement
+    move_command = Twist()
+    move_command.linear.x = speed
+    move_command.linear.y = 0
+    move_command.linear.z = 0
+    move_command.angular.x = 0
+    move_command.angular.y = 0
+    move_command.angular.z = 0
 
-    def run(self):
-        # Create the message
-        message = Twist2DStamped(v=VELOCITY, omega=0.0)
-        
-        # Publish the command
-        rospy.sleep(0.5)  # Allow time for the connection to be established
-        start_time = rospy.get_time()
-        while rospy.get_time() - start_time < self.time_to_move:
-            self._publisher.publish(message)
-            rospy.sleep(0.1)  # Publish at a reasonable rate
-            
-        # Stop the robot after moving
-        self.stop_robot()
+    # Publish the move command
+    rospy.loginfo("Moving Duckiebot forward...")
+    rate = rospy.Rate(10)  # 10 Hz
+    start_time = rospy.get_time()
 
-    def stop_robot(self):
-        stop_message = Twist2DStamped(v=0.0, omega=0.0)
-        self._publisher.publish(stop_message)
+    while rospy.get_time() - start_time < time_to_move:
+        pub.publish(move_command)
+        rate.sleep()
+
+    # Create a Twist message to stop the Duckiebot
+    stop_command = Twist()
+    pub.publish(stop_command)
+    rospy.loginfo("Duckiebot stopped.")
 
 if __name__ == '__main__':
-    node = MoveOneMeterNode(node_name='move_one_meter_node')
-    node.run()
-    rospy.spin()
+    try:
+        move_duckiebot()
+    except rospy.ROSInterruptException:
+        pass
 
