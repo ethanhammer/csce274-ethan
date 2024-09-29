@@ -1,42 +1,49 @@
 #!/usr/bin/env python3
 
+import os
 import rospy
-from duckietown_msgs.msg import WheelsCmd
-import time
+from duckietown.dtros import DTROS, NodeType
+from duckietown_msgs.msg import Twist2DStamped
 
-def drive_straight():
-    # Initialize the ROS node
-    rospy.init_node('linetest', anonymous=True)
-    
-    # Create a publisher for the car command
-    pub = rospy.Publisher('/bigbot/car_cmd_switch_node/cmd', WheelsCmd, queue_size=10)
-    
-    # Set the rate of publishing
-    rate = rospy.Rate(0.1)  # 10 Hz
+# Set linear velocity in m/s
+VELOCITY = 0.3  # Forward linear velocity
 
-    # Create a WheelCmd message
-    cmd = WheelsCmd()
-    cmd.vel_left = 0.3  # Adjust speed as necessary (m/s)
-    cmd.vel_right = 0.3  # Adjust speed as necessary (m/s)
+class line(DTROS):
 
-    # Duration to drive straight (~1m distance)
-    distance = 1.0  # in meters
-    time_to_drive = distance / cmd.vel_left  # time = distance / speed
+    def __init__(self, node_name):
+        super(MoveOneMeterNode, self).__init__(node_name=node_name, node_type=NodeType.GENERIC)
+        
+        # Get vehicle name from environment
+        vehicle_name = os.environ['bigbot']
+        twist_topic = f"/bigbot/car_cmd_switch_node/cmd"
+        
+        # Construct publisher
+        self._publisher = rospy.Publisher(twist_topic, Twist2DStamped, queue_size=1)
+        
+        # Calculate the time to move 1 meter
+        self.move_distance = 1.0  # 1 meter
+        self.time_to_move = self.move_distance / VELOCITY  # seconds
 
-    # Publish the command for the calculated time
-    start_time = time.time()
-    while not rospy.is_shutdown() and (time.time() - start_time < time_to_drive):
-        pub.publish(cmd)
-        rate.sleep()
+    def run(self):
+        # Create the message
+        message = Twist2DStamped(v=VELOCITY, omega=0.0)
+        
+        # Publish the command
+        rospy.sleep(0.5)  # Allow time for the connection to be established
+        start_time = rospy.get_time()
+        while rospy.get_time() - start_time < self.time_to_move:
+            self._publisher.publish(message)
+            rospy.sleep(0.1)  # Publish at a reasonable rate
+            
+        # Stop the robot after moving
+        self.stop_robot()
 
-    # Stop the robot
-    cmd.vel_left = 0.0
-    cmd.vel_right = 0.0
-    pub.publish(cmd)
+    def stop_robot(self):
+        stop_message = Twist2DStamped(v=0.0, omega=0.0)
+        self._publisher.publish(stop_message)
 
 if __name__ == '__main__':
-    try:
-        drive_straight()
-    except rospy.ROSInterruptException:
-        pass
+    node = MoveOneMeterNode(node_name='move_one_meter_node')
+    node.run()
+    rospy.spin()
 
