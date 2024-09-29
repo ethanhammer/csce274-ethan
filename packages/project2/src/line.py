@@ -6,7 +6,7 @@ import time
 
 def drive_straight():
     # Initialize the ROS node
-    rospy.init_node('drive_straight_node', anonymous=True)
+    rospy.init_node('linetest', anonymous=True)
     
     # Create a publisher for the car command
     pub = rospy.Publisher('/car_cmd_switch_node/car_cmd', WheelCmd, queue_size=10)
