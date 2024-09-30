@@ -9,9 +9,9 @@ def move_duckiebot():
 
 
     distance = 1.0  
-    speed = 0.3     
+    speed = 1   
     time_to_move = distance / speed  
-    turn_speed = 0.5  
+    turn_speed = 1
     turn_time = 1.57 / turn_speed  
 
     move_command = Twist2DStamped()
