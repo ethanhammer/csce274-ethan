@@ -9,9 +9,9 @@ def move_duckiebot():
 
 
     distance = 1.0  
-    speed = 1   
+    speed = 0.2
     time_to_move = distance / speed  
-    turn_speed = 1
+    turn_speed = 2
     turn_time = 1.57 / turn_speed  
 
     move_command = Twist2DStamped()
@@ -29,7 +29,7 @@ def move_duckiebot():
     stop_command.v = 0
     stop_command.omega = 0
 
-    rate = rospy.Rate(10) 
+    rate = rospy.Rate(100) 
 
     for _ in range(4):  
     
