@@ -8,11 +8,11 @@ def move_duckiebot():
     pub = rospy.Publisher('/bigbot/car_cmd_switch_node/cmd', Twist2DStamped, queue_size=10)
 
 
-    distance = 1.0  
+    distance = 0.6  
     speed = 0.2
     time_to_move = distance / speed  
-    turn_speed = 2
-    turn_time = 1.57 / turn_speed  
+    turn_speed = 4.5
+    turn_time = 1.4 / turn_speed  
 
     move_command = Twist2DStamped()
     move_command.header.stamp = rospy.Time.now()
