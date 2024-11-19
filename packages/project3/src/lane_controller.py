@@ -24,7 +24,6 @@ class SimpleLaneControllerNode:
 
         self.last_time = rospy.Time.now().to_sec()
 
-
         self.max_error = 16  
         self.max_integral = 0.5  
         self.max_omega = 1000  
